@@ -20,21 +20,31 @@ class TestString
     TestString(const char *s1)
     {
         length = strlen(s1);
-        str = new char[length];
+        str = new char[length+1];
         strcpy(str,s1);
     }
     
     TestString(int val)
     {
-        length = 1;
-        str = new char[length];
+        length = val;
+        str = new char[length+1];
+        str[0] = '\0';
     }
     
     TestString(const TestString& other)
     {
         length = other.length;
-        str = new char[length];
-        strcpy(str,other.str);
+        
+        if(other.str)
+        {
+            str = new char[length+1];
+            strcpy(str,other.str);
+        }
+        else
+        {
+            length = 0;
+            str = nullptr;
+        }
     }
     
     TestString& operator=(const TestString &other)
@@ -43,8 +53,17 @@ class TestString
         {
             delete[] str;
             length = other.length;
-            str = new char[length];
-            strcpy(str,other.str);
+            
+            if(other.str)
+            {
+                str = new char[length+1];
+                strcpy(str,other.str);
+            }
+            else
+            {
+                length = 0;
+                str = nullptr;
+            }
         }
         return *this;
     }
@@ -52,9 +71,8 @@ class TestString
     TestString(TestString&& other)
     {
         length = other.length;
-        str = new char[length];
-        strcpy(str,other.str);
-        
+        str = other.str;
+                
         other.length = 0;
         other.str = nullptr;
     }
@@ -65,8 +83,7 @@ class TestString
         {   
             delete[] str;
             length = other.length;
-            str = new char[length];
-            strcpy(str,other.str);
+            str = other.str;
         }
         
         other.length = 0;
@@ -78,16 +95,23 @@ class TestString
     TestString operator+(const TestString& other1)
     {
         TestString ts;
-        ts.length = length + other1.length - 1;
-        ts.str = new char[length];
-        strcpy(ts.str,str);
-        strcat(ts.str,other1.str);
+        ts.length = length + other1.length;
+        ts.str = new char[ts.length+1];
+        
+        if(str)
+            strcpy(ts.str,str);
+        else
+            ts.str[0] = '\0';
+            
+        if(other1.str)
+            strcat(ts.str,other1.str);
+            
         return ts;
     }
     
 friend ostream& operator<<(ostream &os, const TestString& other)
     {
-        if(other.length > 0 && other.str)
+        if(other.str)
         {
             os<<(other.str)<<" length = "<<other.length<<endl;
         }
