@@ -1,6 +1,7 @@
 // Online C++ compiler to run C++ program online
 #include <iostream>
 #include<bits/stdc++.h>
+using namespace std;
 
 class TestString
 {
@@ -9,58 +10,89 @@ class TestString
     
     public:
     
-    TestString() {}
+    TestString() : length(0), str(nullptr) {}
     
-    TestString(char *s1)
+    ~TestString() {
+         length = 0;
+         delete[] str;
+    }
+     
+    TestString(const char *s1)
     {
         length = strlen(s1);
-        str = new char[length+1];
-        strcpy(s1,str);
+        str = new char[length];
+        strcpy(str,s1);
+    }
+    
+    TestString(int val)
+    {
+        length = 1;
+        str = new char[length];
     }
     
     TestString(const TestString& other)
     {
         length = other.length;
-        delete str;
-        str = new char[other.length+1];
-        strcpy(other.str,str);
+        str = new char[length];
+        strcpy(str,other.str);
     }
     
     TestString& operator=(const TestString &other)
     {
-        length = other.length;
-        delete str;
-        str = new char[other.length+1];
-        strcpy(other.str,str);
+        if(this != &other)
+        {
+            delete[] str;
+            length = other.length;
+            str = new char[length];
+            strcpy(str,other.str);
+        }
         return *this;
     }
     
-    TestString(const TestString&& other)
+    TestString(TestString&& other)
     {
         length = other.length;
-        delete str;
-        str = new char[other.length+1];
-        strcpy(other.str,str);
-        delete other.str;
+        str = new char[length];
+        strcpy(str,other.str);
+        
+        other.length = 0;
+        other.str = nullptr;
     }
     
-    TestString& operator=(const TestString &&other)
+    TestString& operator=(TestString &&other)
     {
-        length = other.length;
-        delete str;
-        str = new char[other.length+1];
-        strcpy(other.str,str);
-        delete other.str;
+        if(this != &other)
+        {   
+            delete[] str;
+            length = other.length;
+            str = new char[length];
+            strcpy(str,other.str);
+        }
+        
+        other.length = 0;
+        other.str = nullptr;
+        
         return *this;
     }
     
-    TestString& operator+(const TestString &other1)
+    TestString operator+(const TestString& other1)
     {
-        length = length + other1.length;
-        delete str;
-        temp = new char[length+1];
-        //strcpy(other.str,str); //string append function
-        return *this;
+        TestString ts;
+        ts.length = length + other1.length - 1;
+        ts.str = new char[length];
+        strcpy(ts.str,str);
+        strcat(ts.str,other1.str);
+        return ts;
+    }
+    
+friend ostream& operator<<(ostream &os, const TestString& other)
+    {
+        if(other.length > 0 && other.str)
+        {
+            os<<(other.str)<<" length = "<<other.length<<endl;
+        }
+        
+        return os;
     }
     
 };
@@ -82,9 +114,9 @@ TestString t2 = t1;
 
 TestString t3 = t1 + "World";
 
-TestString t4 = std::move(t3);
-
 std::cout<<t3; // This should print HelloWorld
+
+TestString t4 = std::move(t3);
 
 TestString t6 =1; 
 
