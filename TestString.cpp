@@ -24,6 +24,14 @@ class TestString
         strcpy(str,s1);
     }
     
+    TestString(char c)
+    {
+        length = 1;
+        str = new char[length+1];
+        str[0] = c;
+        str[1] = '\0';
+    }
+    
     TestString(int val)
     {
         length = val;
@@ -108,6 +116,51 @@ class TestString
             
         return ts;
     }
+   
+    TestString operator+=(const TestString& other1)
+    {
+        TestString ts;
+        ts.length = length + other1.length;
+        ts.str = new char[ts.length+1];
+        
+        if(str)
+            strcpy(ts.str,str);
+        else
+            ts.str[0] = '\0';
+            
+        delete[] str;
+        str = new char[ts.length+1];
+        length = ts.length;
+        strcpy(str,ts.str);
+            
+        if(other1.str)
+            strcat(str,other1.str);
+          
+        return str;
+    }
+    
+    bool operator==(const TestString& other1)
+    {
+        bool isEqual = false;
+        
+        if(length != other1.length)
+            return isEqual;
+            
+        if(strcmp(str,other1.str) == 0)
+            isEqual = true;
+        
+        return isEqual;
+    }
+    
+    char& operator[](int index)
+    {
+        return str[index];
+    }
+     
+    int size()
+    {
+        return length;
+    }
     
 friend ostream& operator<<(ostream &os, const TestString& other)
     {
@@ -127,23 +180,33 @@ Dont use std::string in your code
  
 
 int main()
-
 {
+    TestString s1("Hello");
+    TestString s2("World");
 
-TestString t;
+    TestString s3 = s1 + s2;
+    cout << s3 << endl;   // HelloWorld
 
-TestString t1("Hello");
+    s1 += s2;
+    cout << s1 << endl;   // HelloWorld
 
-TestString t2 = t1;
+    TestString s4('A');
+    cout << s4 << endl;   // A
 
-TestString t3 = t1 + "World";
+    if(s1 == s3)
+        cout << "Equal\n";
 
-std::cout<<t3; // This should print HelloWorld
+    s1[0] = 'h';
+    cout << s1 << endl;   // helloWorld
 
-TestString t4 = std::move(t3);
+    cout << s1.size() << endl;
 
-TestString t6 =1; 
+    TestString s5 = std::move(s1);
+    
+    cout<<s1<<endl;
+    
+    cout<<s5<<endl;
 
-return 0;
+    return 0;
 
 }
